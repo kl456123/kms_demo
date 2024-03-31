@@ -1,4 +1,5 @@
 import * as AWS from "@aws-sdk/client-kms";
+import { KMSClient } from "@aws-sdk/client-kms";
 import { EncryptRequest } from "@aws-sdk/client-kms";
 
 export class KmsManager {
@@ -10,11 +11,13 @@ export class KmsManager {
     awsSecret: string,
     region: string,
   ) {
-    this.kmsClient = new AWS.KMS();
+    this.kmsClient = new AWS.KMS({
+      region,
+      credentials: { accessKeyId: awsKey, secretAccessKey: awsSecret },
+    });
   }
 
   async encrypt(src: string): Promise<string> {
-    AWS.EncryptRequestFilterSensitiveLog;
     const srcBytes = Buffer.from(src);
     const resp = await this.kmsClient.encrypt({
       KeyId: this.dataKeyId,

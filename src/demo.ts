@@ -6,16 +6,22 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 async function main() {
-  const rpcUrl = "";
+  const rpcUrl = `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`;
   const provider = new ethers.JsonRpcProvider(rpcUrl);
   const { chainId } = await provider.getNetwork();
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY || "", provider);
 
   const awsKey = "";
   const awsSecret = "";
-  const enclaveUri = "";
+  const enclaveUri = process.env.ENCLAVE_URI || "";
+  const kmsDataKey = "";
 
-  const enclave_client = new EnclaveClient(enclaveUri, awsKey, awsSecret);
+  const enclave_client = new EnclaveClient(
+    enclaveUri,
+    kmsDataKey,
+    awsKey,
+    awsSecret,
+  );
   const secretId = "";
   const tx = await wallet.populateTransaction({
     to: ethers.ZeroAddress,
@@ -33,10 +39,10 @@ async function main() {
   };
 
   const { sig, hash } = await enclave_client.sign(txPayload, secretId);
-  const btx = ethers.Transaction.from(tx);
-  btx.signature = sig;
-  const rawTx = await provider.broadcastTransaction(btx.serialized);
-  await rawTx.wait();
+  // const btx = ethers.Transaction.from(tx);
+  // btx.signature = sig;
+  // const rawTx = await provider.broadcastTransaction(btx.serialized);
+  // await rawTx.wait();
 }
 
 main();

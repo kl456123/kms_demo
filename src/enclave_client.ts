@@ -14,10 +14,16 @@ export class EnclaveClient {
 
   constructor(
     private readonly enclaveUri: string,
+    private readonly kmsDataKey: string,
     awsKey: string,
     awsSecret: string,
   ) {
-    this.kmsManager = new KmsManager("datakeyId", awsKey, awsSecret, "region");
+    this.kmsManager = new KmsManager(
+      kmsDataKey,
+      awsKey,
+      awsSecret,
+      "us-east-2",
+    );
   }
 
   async sign(tx: TxPayloadEIP1559, secretId: string): Promise<EnclaveRes> {
@@ -52,7 +58,9 @@ export class EnclaveClient {
     });
     return JSON.stringify({
       req: plainText,
-      reqHash: this.kmsManager.encrypt(ethers.keccak256(payloadJson)),
+      reqHash: this.kmsManager.encrypt(
+        ethers.keccak256(ethers.toUtf8Bytes(payloadJson)),
+      ),
     });
   }
 }
