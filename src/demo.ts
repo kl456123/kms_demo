@@ -39,10 +39,10 @@ async function main() {
   };
 
   const { sig, hash } = await enclave_client.sign(txPayload, secretId);
-  // const btx = ethers.Transaction.from(tx);
-  // btx.signature = sig;
-  // const rawTx = await provider.broadcastTransaction(btx.serialized);
-  // await rawTx.wait();
+  const btx = ethers.Transaction.from(tx);
+  btx.signature = sig;
+  const rawTx = await provider.broadcastTransaction(btx.serialized);
+  await rawTx.wait();
 }
 
 main();
