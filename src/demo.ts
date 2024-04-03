@@ -9,12 +9,12 @@ async function main() {
   const rpcUrl = `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`;
   const provider = new ethers.JsonRpcProvider(rpcUrl);
   const { chainId } = await provider.getNetwork();
-  const wallet = new ethers.Wallet(process.env.PRIVATE_KEY || "", provider);
+  const wallet = ethers.Wallet.createRandom(provider);
 
   const awsKey = "";
   const awsSecret = "";
   const enclaveUri = process.env.ENCLAVE_URI || "";
-  const kmsDataKey = "";
+  const kmsDataKey = process.env.REQUEST_KEY || "";
 
   const enclave_client = new EnclaveClient(
     enclaveUri,
@@ -22,7 +22,7 @@ async function main() {
     awsKey,
     awsSecret,
   );
-  const secretId = "";
+  const secretId = process.env.SECRET_ID || "";
   const tx = await wallet.populateTransaction({
     to: ethers.ZeroAddress,
     value: ethers.parseEther("1"),
