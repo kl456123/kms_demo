@@ -25,13 +25,14 @@ async function main() {
   );
   const secretId = process.env.SECRET_PRIVATE_KEY || "";
   const { maxFeePerGas, maxPriorityFeePerGas } = await provider.getFeeData();
+  const nonce = await provider.getTransactionCount(eoa);
   const tx = {
     from: eoa,
     data: "0x",
+    nonce,
     to: ethers.ZeroAddress,
-    nonce: await provider.getTransactionCount(eoa),
     value: ethers.parseEther("0"),
-    gasLimit: undefined,
+    gasLimit: 0n,
     maxPriorityFeePerGas,
     maxFeePerGas,
   };
