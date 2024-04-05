@@ -39,8 +39,8 @@ export class EnclaveClient {
         transaction_hash: string;
       };
       return {
-        sig: data.transaction_signed,
-        hash: data.transaction_hash,
+        signedTx: data.transaction_signed,
+        txHash: data.transaction_hash,
         success: true,
       };
     } catch (e) {

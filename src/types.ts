@@ -22,8 +22,8 @@ export interface EnclaveReq {
 }
 
 export interface EnclaveRes {
-  sig: string;
-  hash: string;
+  signedTx: string;
+  txHash: string;
   success: boolean;
 }
 

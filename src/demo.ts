@@ -49,8 +49,8 @@ async function main() {
     maxFeePerGas: tx.maxFeePerGas!.toString(),
   };
 
-  const { sig, hash } = await enclave_client.sign(txPayload, secretId);
-  const rawTx = await provider.broadcastTransaction(sig);
+  const { signedTx } = await enclave_client.sign(txPayload, secretId);
+  const rawTx = await provider.broadcastTransaction(signedTx);
   await rawTx.wait();
 }
 
