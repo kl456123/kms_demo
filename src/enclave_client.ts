@@ -27,7 +27,8 @@ export class EnclaveClient {
   }
 
   async sign(tx: TxPayloadEIP1559, secretId: string): Promise<EnclaveRes> {
-    return this.doPost(this.toL1TxReqJson(tx, secretId));
+    const reqJson = await this.toL1TxReqJson(tx, secretId);
+    return this.doPost(reqJson);
   }
 
   async doPost(jsonStr: string): Promise<EnclaveRes> {
@@ -47,7 +48,10 @@ export class EnclaveClient {
     }
   }
 
-  private toL1TxReqJson(payload: TxPayloadEIP1559, secretId: string): string {
+  private async toL1TxReqJson(
+    payload: TxPayloadEIP1559,
+    secretId: string,
+  ): Promise<string> {
     const payloadJson = JSON.stringify(payload);
 
     const plainText = JSON.stringify({
@@ -56,11 +60,12 @@ export class EnclaveClient {
       secretId,
       sign_type: EnclaveSignType.ecdsaEIP1559,
     });
+    const reqHash = await this.kmsManager.encrypt(
+      ethers.keccak256(ethers.toUtf8Bytes(payloadJson)),
+    );
     return JSON.stringify({
       req: plainText,
-      reqHash: this.kmsManager.encrypt(
-        ethers.keccak256(ethers.toUtf8Bytes(payloadJson)),
-      ),
+      reqHash,
     });
   }
 }

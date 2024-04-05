@@ -11,8 +11,8 @@ async function main() {
   const { chainId } = await provider.getNetwork();
   const wallet = ethers.Wallet.createRandom(provider);
 
-  const awsKey = "";
-  const awsSecret = "";
+  const awsKey = process.env.AWS_KEY || "";
+  const awsSecret = process.env.AWS_SECRET || "";
   const enclaveUri = process.env.ENCLAVE_URI || "";
   const kmsDataKey = process.env.REQUEST_KEY || "";
 
@@ -25,7 +25,7 @@ async function main() {
   const secretId = process.env.SECRET_ID || "";
   const tx = await wallet.populateTransaction({
     to: ethers.ZeroAddress,
-    value: ethers.parseEther("1"),
+    value: ethers.parseEther("0"),
   });
   const txPayload: TxPayloadEIP1559 = {
     nonce: tx.nonce!,
