@@ -9,12 +9,13 @@ async function main() {
   const rpcUrl = `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`;
   const provider = new ethers.JsonRpcProvider(rpcUrl);
   const { chainId } = await provider.getNetwork();
-  const wallet = ethers.Wallet.createRandom(provider);
 
   const awsKey = process.env.AWS_KEY || "";
   const awsSecret = process.env.AWS_SECRET || "";
   const enclaveUri = process.env.ENCLAVE_URI || "";
   const kmsDataKey = process.env.REQUEST_KEY || "";
+
+  const eoa = process.env.ADDRESS || "0x";
 
   const enclave_client = new EnclaveClient(
     enclaveUri,
@@ -22,14 +23,23 @@ async function main() {
     awsKey,
     awsSecret,
   );
-  const secretId = process.env.SECRET_ID || "";
-  const tx = await wallet.populateTransaction({
+  const secretId = process.env.SECRET_PRIVATE_KEY || "";
+  const { maxFeePerGas, maxPriorityFeePerGas } = await provider.getFeeData();
+  const tx = {
+    from: eoa,
+    data: "0x",
     to: ethers.ZeroAddress,
+    nonce: await provider.getTransactionCount(eoa),
     value: ethers.parseEther("0"),
-  });
+    gasLimit: undefined,
+    maxPriorityFeePerGas,
+    maxFeePerGas,
+  };
+
+  tx.gasLimit = await provider.estimateGas(tx);
   const txPayload: TxPayloadEIP1559 = {
     nonce: tx.nonce!,
-    gas: tx.gasLimit!.toString(),
+    gas: tx.gasLimit.toString(),
     to: tx.to!,
     value: tx.value!.toString(),
     data: tx.data ?? "0x",
@@ -39,9 +49,7 @@ async function main() {
   };
 
   const { sig, hash } = await enclave_client.sign(txPayload, secretId);
-  const btx = ethers.Transaction.from(tx);
-  btx.signature = sig;
-  const rawTx = await provider.broadcastTransaction(btx.serialized);
+  const rawTx = await provider.broadcastTransaction(sig);
   await rawTx.wait();
 }
 

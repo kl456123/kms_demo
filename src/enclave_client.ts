@@ -50,14 +50,14 @@ export class EnclaveClient {
 
   private async toL1TxReqJson(
     payload: TxPayloadEIP1559,
-    secretId: string,
+    secret_id: string,
   ): Promise<string> {
     const payloadJson = JSON.stringify(payload);
 
     const plainText = JSON.stringify({
       method: "sign_transaction",
       transaction_payload: payloadJson,
-      secretId,
+      secret_id,
       sign_type: EnclaveSignType.ecdsaEIP1559,
     });
     const reqHash = await this.kmsManager.encrypt(
